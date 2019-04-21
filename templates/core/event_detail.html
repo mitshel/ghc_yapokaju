@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% load thumbnail widget_tweaks %}
+
+
+{% block content %}
+<style>
+    section {
+        position: relative;
+    }
+    .section-event-detail-header .section-wrapper {
+        padding-bottom: 0;
+    }
+    .section-event-detail-header_bd-image h1,
+    .section-event-detail-header_bd-image .short_description {
+        color: #000000;
+    }
+</style>
+
+<section class="section-event-detail-header {% if object.template.image %}section-event-detail-header_bd-image{% endif %}">
+    <div class="section-wrapper">
+        <div class="container">
+            {% thumbnail object.template.image.file "1366x196" crop='center' as im %}
+            <div class="container-bg"
+                style="background-image: url({{ im.url }});"></div>
+            {% endthumbnail %}
+            <div class="section-body ml-3">
+                <h1 class="pt-6 mb-2">{{ object.template.name }}</h1>
+                <div class="short_description lead mb-2">{{ object.template.short_description }}</div>
+                <div class="lead">Дата: {{ object.datetime|date:"d F Y г." }}</div>
+                <div class="lead pb-5">
+                    {% if not object.time_by_agreement %}
+                        Время: {{ object.datetime|date:"H:i" }}
+                    {% else %}
+                        Время по договоренности
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section>
+    <div class="section-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-8">
+                    <div class="mb-4">
+                        <div class="h3">О мероприятии</div>
+                        <div class="lead mb-2">Организатор: {{ object.user.get_full_name }}</div>
+                        {{ object.template.description|safe }}
+                        {% if object.comment %}
+                        <div class="bg-light py-4 px-3 mt-3">
+                            <div class="h5">Комментарий организатора</div>
+                            {{ object.comment }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-4">
+                    {% if not user.is_authenticated %}
+                        <p><a href="{% url 'auth_login' %}">Войдите</a> в свою учетную запись,
+                        чтобы записаться на мероприятие.</p>
+                    {% elif show_singup_form  %}
+                        {% if not user.is_volunteer %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Записаться на мероприятие</h5>
+                                <form action=""
+                                    method="POST">
+                                    {% csrf_token %}
+                                    {% for field in forms.singup %}
+                                        {% if field.is_hidden %}
+                                            {{ field }}
+                                        {% else %}
+                                        <div class="form-group">
+                                            {{ field.label_tag }}
+                                            {% render_field field class+="form-control" %}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div class="form-group mb-0">
+                                        <button class="btn btn-success btn-block" 
+                                            type="submit"
+                                            name="action"
+                                            value="singup">Записаться</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card-footer text-muted">
+                                Уважаемый пользователь, просим Вас принять во внимание, что в текущий момент площадка работает в тестовом режиме и работа волонтеров может быть ограничена городом Арзамас и Арзамасском районом Нижегородской области.
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="card mb-4">
+                          <div class="card-body">
+                            <h5 class="card-title">Информация</h5>
+                            <p class="card-text">
+                                Подписка на участие в мероприятии недоступна для волонтеров, но Вы можете <a href="{% url 'profile' %}">создать свое мероприятие</a>.
+                            </p>
+                          </div>
+                        </div>
+                        {% endif %}
+                    {% elif member_list.0 %}
+                        <div class="card mb-4">
+                          <div class="card-body">
+                            <h5 class="card-title">Информация</h5>
+                            <p class="card-text">
+                                Вы зарегестрированы на данное мероприятие: {{ member_list.0.datetime.datetime|date:"d F Y г." }}
+                                {% if not object.time_by_agreement %}
+                                    в {{ member_list.0.datetime.datetime|date:"H:i" }}
+                                {% else %}
+                                    <br>Время по договоренности
+                                {% endif %}
+                            </p>
+
+                            {%  if member_list.0.datetime.datetime >= now %}
+                            <form action="" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group mb-0">
+                                    <button class="btn btn-secondary btn-block"
+                                        type="submit"
+                                        name="action"
+                                        value="singdown">Отменить</button>
+                                </div>
+                            </form>
+                            {% endif %}
+                          </div>
+                        </div>
+                    {% elif so_many_subscriptions %}
+                        <div class="card mb-4">
+                          <div class="card-body">
+                            <h5 class="card-title">Информация</h5>
+                            <!--<h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>-->
+                            <p class="card-text">Запись на мероприятие недоступна, так как Вы уже записаны на максимально возможное количество мероприятий ({{ MAX_SUBSCRIPTION }} мероприятия).
+                                Мероприятия, на которые Вы уже записаны можно посмотреть при помощи меню <a href="{%  url 'profile' %}">"Мой профиль"</a>
+                            </p>
+                          </div>
+                        </div>
+                    {% else %}
+                    <p class="mb-3">
+                        Регистрация на мероприятия завершена.
+                    </p>
+                    {% endif %}
+                    {% if object.restrictions.exists %}
+                        <div class="card mb-4">
+                          <div class="card-body">
+                            <h5 class="card-title">Ограничения</h5>
+                                <ul>
+                                    {% for restriction in object.restrictions.all %}
+                                    <li>
+                                        {{ restriction.text }}
+                                        <i class="fas fa-question-circle c-pointer"
+                                            title="{{ restriction.description }}"></i>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                          </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% if object.template.images.all|length > 1 %}
+<section>
+    <div class="section-wrapper pt-0">
+        <div class="container">
+            <div class="section-header mb-3">
+                <h3>Галерея</h3>
+            </div>
+            <div class="section-body">
+                <div class="owl-carousel">
+                    {% for image in object.template.images.all %}
+                        {% thumbnail image.file "340x225" crop='center' as im %}
+                        <div style="padding: 0 15px;">
+                            <a class="fancybox"
+                                href="{{ image.file.url }}"
+                                title="{{ image.alt }}">
+                                <img src="{{ im.url }}"
+                                        alt="{{ image.alt }}" />
+                            </a>
+                        </div>
+                        {% endthumbnail %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!--- КАРТЫ ------->
+{% if object.template.map_addr %}
+<section>
+    <div class="section-wrapper pt-0">
+        <div class="container">
+            <div class="section-header mb-3">
+                <h3>Место на карте</h3>
+            </div>
+            <div class="section-body">
+                <div id="map" style="width: 600px; height: 400px">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://api-maps.yandex.ru/2.1/?apikey=ae885af8-10d8-4d36-ab58-239b8a1940b0&lang=ru_RU" type="text/javascript"></script>
+
+<script type='text/javascript'>
+    ymaps.ready(init);
+    function init(){
+        var geocoder = new ymaps.geocode(
+            // Строка с адресом, который нужно геокодировать
+            '{{ object.template.map_addr }}',
+            // требуемое количество результатов
+            { results: 1 }
+        );
+        // После того, как поиск вернул результат, вызывается callback-функция
+        geocoder.then(
+                function (res) {
+                    // координаты объекта
+                    var firstGeoObject = res.geoObjects.get(0)
+                    var coord = firstGeoObject.geometry.getCoordinates();
+                    var bounds = firstGeoObject.properties.get('boundedBy');
+
+                    var map = new ymaps.Map('map', {
+                        // Центр карты - координаты первого элемента
+                        center: coord,
+                        // Коэффициент масштабирования
+                        zoom: 11,
+                        // включаем масштабирование карты колесом
+                        //behaviors: ['default', 'scrollZoom'],
+                        //controls: ['mapTools']
+                    });
+
+                    firstGeoObject.options.set('preset', 'islands#darkBlueDotIconWithCaption');
+                    // Получаем строку с адресом и выводим в иконке геообъекта.
+                    firstGeoObject.properties.set('iconCaption', firstGeoObject.getAddressLine());
+
+                    // Добавляем первый найденный геообъект на карту.
+                    map.geoObjects.add(firstGeoObject);
+                    // Масштабируем карту на область видимости геообъекта.
+                    map.setBounds(bounds, {
+                        // Проверяем наличие тайлов на данном масштабе.
+                        checkZoomRange: true
+                    });
+
+                    /**
+                     * Если нужно добавить по найденным геокодером координатам метку со своими стилями и контентом балуна, создаем новую метку по координатам найденной и добавляем ее на карту вместо найденной.
+                     */
+                    /**
+                     var myPlacemark = new ymaps.Placemark(coords, {
+                     iconContent: 'моя метка',
+                     balloonContent: 'Содержимое балуна <strong>моей метки</strong>'
+                     }, {
+                     preset: 'islands#violetStretchyIcon'
+                     });
+
+                     myMap.geoObjects.add(myPlacemark);
+                     */
+                }
+        );
+    }
+</script>
+{% endif %}
+<!----------------->
+
+{% if user.is_authenticated and not user.is_volunteer and member_list %}
+<section>
+    <div class="section-wrapper pt-0">
+        <div class="container">
+            <div class="section-header mb-3">
+                <h3>Написать отзыв</h3>
+            </div>
+            <div class="section-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div>
+                            <form action=""
+                                    method="post">
+                                {% csrf_token %}
+                                {% for field in forms.feedback %}
+                                    {% if field.is_hidden %}
+                                        {{ field }}
+                                    {% else %}
+                                    <div class="form-group">
+                                        {{ field.label_tag }}
+                                        {% render_field field class+="form-control" %}
+                                        {% if field.help_text %}
+                                        <span class="form-text text-muted">{{ field.help_text }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="form-group mb-0">
+                                    <button class="btn btn-success btn-block" 
+                                        type="submit"
+                                        name="action"
+                                        value="feedback">Отправить</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+<section>
+    <div class="section-wrapper pt-0">
+        <div class="container">
+            <div class="section-header mb-3">
+                <h3>Отзывы о мероприятии:</h3>
+            </div>
+            <div class="section-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% for feedback in feedback_list %}
+                        <div class="card border-0 rounded-0 mb-4 {% if not feedback.show %}bg-warning{% else %}bg-light{% endif %}">
+                            <div class="card-body">
+                                <p class="card-text">{{ feedback.text }}</p>
+                                <p class="card-text font-italic">
+                                    {{ feedback.created_at|date:"d N Y г." }} - {{ feedback.user.get_full_name }}
+                                    {% if not feedback.show %}
+                                    (ваш отзыв на модерации)
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>Нет отзывов</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

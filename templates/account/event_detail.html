@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load thumbnail core_tegs %}
+
+
+{% block content %}
+<section>
+    <div class="section-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-3 pt-3">
+                    {% include 'account/sidebar.html' %}
+                </div>
+                <div class="col-9 pt-3">
+                    <h2>{{ object.template.name }}</h2>
+                    {% if object.template.file %}
+                    <p><a href="{{ object.template.file.url }}">Скачать файл</a> с описанием экскурсии.</p>
+                    {% endif %}
+                    <p><a href="{% url 'profile_event_change' object.id %}">Редактировать</a></p>
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col"
+                                    class="nowrap"
+                                    style="width: 1px;">Дата и время</th>
+                                <th scope="col">Имя</th>
+                                <th scope="col">Номер телефона</th>
+                                <th scope="col">E-mail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in member_list %}
+                            <tr>
+                                <td class="nowrap">
+                                    <p class="my-0">
+                                        {{ member.datetime.datetime|date:"d F Y г." }}
+                                        {% if not member.event.time_by_agreement %}
+                                        в {{ member.datetime.datetime|date:"H:i" }}
+                                        {% else %}
+                                        <br>Время по договоренности
+                                        {% endif %}
+                                    </p>
+                                </td>
+                                <td>{{ member.user.get_full_name }}</td>
+                                <td>{{ member.user.phone|phone }}</td>
+                                <td>{{ member.user.email }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">Нет заявок</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

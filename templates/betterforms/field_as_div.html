@@ -1,0 +1,35 @@
+{% load betterforms_tags widget_tweaks core_tegs %}
+
+
+{% if field.is_hidden %}
+  {{ field }}
+{% else %}
+<div class="form-group {% if field.css_classes %}{{ field.css_classes }} {% endif %}{{ field.html_name }}{% if field.form.prefix %} {{ field.name }}{% endif %} formField{% if field.field.required and not field.form.required_css_class %} required{% endif %}">
+    {% if field|is_checkbox %}
+        <div class="custom-control custom-checkbox">
+            {% render_field field class+="custom-control-input" %}
+            <label class="custom-control-label"
+                for="{{ field.auto_id }}">{{ field.label }}</label>
+        </div>
+    {% elif field|is_checkbox_sm %}
+        {{ field.label_tag }}
+        {{ field }}
+    {% elif field|is_radioselect %}
+        {{ field.label_tag }}
+        {{ field }}
+    {% elif field|is_date %}
+        {{ field.label_tag }}
+        {% render_field field class+="form-control datepicker" %}
+    {% else %}
+        {{ field.label_tag }}
+        {% render_field field class+="form-control" %}
+    {% endif %}
+
+    {% if field.help_text %}
+    <small class="form-text text-muted">{{ field.help_text }}</small>
+    {% endif %}
+    {% for error in field.errors %}
+    <span class="form-text text-danger">{{ error }}</span>
+    {% endfor %}
+</div>
+{% endif %}

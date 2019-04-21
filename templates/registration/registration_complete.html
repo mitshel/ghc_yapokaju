@@ -1,0 +1,22 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Activation email sent" %}{% endblock %}
+
+{% block content %}
+ <div class="jumbotron" style="background-color: #EEF0FF">
+  <h1 class="display-6"><i class="fa fa-envelope" aria-hidden="true"></i> Завершение регистрации</h1>
+  <p class="lead">Для завершения регистрации проверьте свою электронную почту и следуйте направленной Вам в письме инструкции
+      по активации Вашей учетной записи.</p>
+</div>
+{% endblock %}
+
+
+{% comment %}
+**registration/registration_complete.html**
+
+Used after successful completion of the registration form. This
+template has no context variables of its own, and should simply inform
+the user that an email containing account-activation information has
+been sent.
+{% endcomment %}

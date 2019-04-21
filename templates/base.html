@@ -1,0 +1,210 @@
+{% load i18n static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ЯПОКАЖУ.РФ</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+         crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker3.standalone.css" />
+    <link rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/css/jquery.fancybox.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
+    <style>
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        .h1,
+        .h2,
+        .h3,
+        .h4,
+        .h5 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        section {
+            position: relative;
+            
+        }
+        .c-pointer {
+            cursor: help;
+        }
+        .nowrap {
+            white-space: nowrap;
+        }
+        .container {
+            position: relative;
+        }
+        .pt-6 {
+            padding-top: 4.5rem!important;
+        }
+        .pb-6 {
+            padding-bottom: 4.5rem!important;
+        }
+        .section-wrapper {
+            padding: 50px 0;
+        }
+        .section-bg,
+        .container-bg {
+            background-position: center;
+            background-size: cover;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: -2;
+        }
+        .section-bg:before,
+        .container-bg:before {
+            background: rgba(255, 255, 255, 0.6);
+            content: "";
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: -1;
+        }
+        .section-bg.overlay-light:before {
+            background: rgba(255, 255, 255, 0.4); /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0)); /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        }
+        .section-footer {
+            background: #2f2f2f;
+            padding-bottom: 0;
+        }
+        .section-header {
+            margin-bottom: 36px;
+        }
+        .section-header__text {
+            font-weight: 600;
+        }
+        .navbar {
+            position: relative;
+            z-index: 1000;
+        }
+        .bg-dark {
+            background-color: rgba(52, 58, 64, 0.9) !important;
+        }
+        .nav-link {
+            line-height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand"
+               href="{% url 'homepage' %}">Я ПОКАЖУ</a>
+            <button class="navbar-toggler"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#navbarCollapse"
+                    aria-controls="navbarCollapse"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse"
+                 id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link"
+                           href="{% url 'homepage' %}">Главная</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{% url 'profile' %}">Мой профиль</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{% url 'auth_logout' %}">Выход</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{% url 'auth_login' %}">Вход</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{% url 'registration_register' %}">Регистрация</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% block content %}{% endblock content %}
+
+    <section class="section-footer">
+            <div class="container">
+            <div class="row">
+                  <div class="col-6 pt-3">
+                        <h5 class="text-white">Информация:</h5>
+                        <p class="text-white">Миссия проекта - в оказании волонтерской помощи по посещению объектов культуры г.Арзамаса для нуждающихся в такой помощи лиц.</p>
+                  </div>
+                  <div class="col-6 pt-3">
+                        <h5 class="text-white">Контакты:</h5>
+                      <p class="text-white">Предложения по работе сайта и <a href="https://япокажу.рф/media/files/2019/02/06/scGaidarMuseum-lit_cvUIds7.docx">сценариям мероприятий</a> направляйте на e-mail <a href="mailto:admin@yapokaju.ru">admin@yapokaju.ru</a></p>
+                  </div>
+            </div>
+            </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.easytabs/3.2.0/jquery.easytabs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.4.7/cleave.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.4.7/addons/cleave-phone.ru.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js"></script>
+    {% block form_media %}{% endblock form_media %}
+    <script src="{% static 'core/site.js' %}"></script>
+    <script>
+        (function ($) {
+            $(document.body).sitePlugin();
+
+            $(".owl-carousel").owlCarousel();
+            $(".fancybox").fancybox();
+
+            new Cleave('[name="phone"]', {
+                phone: true,
+                phoneRegionCode: 'ru',
+                prefix: '+7'
+            });
+            
+            $('.popover1').popover();
+        })(jQuery);
+    </script>
+</body>
+</html>

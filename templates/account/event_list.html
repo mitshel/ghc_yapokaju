@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+
+
+{% block content %}
+<section>
+    <div class="section-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-3 pt-3">
+                    {% include 'account/sidebar.html' %}
+                </div>
+                <div class="col-9 pt-3">
+                    <h2>События</h2>
+                    <div class="my-3">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <a class="btn btn-success"
+                                href="{% url 'profile_event_create' %}">Создать событие</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 1px;">#</th>
+                                <th scope="col">Название</th>
+                                <th scope="col">Заявок</th>
+                                <th scope="col">Последняя дата</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in object_list %}
+                            <tr>
+                                <th>{{ event.id|stringformat:"06d" }}</th>
+                                <td>
+                                    <a href="{% url 'profile_event_detail' event.id %}">{{ event.template.name }}</a>
+                                </td>
+                                <td>{% if event.members_count %}{{ event.members_count }}{% endif %}</td>
+                                <!--<td>{ { event.template.get_type_display } }</td>-->
+                                <td>{{ event.maxdate|date:"d.m.Y" }}</td>
+                                <td>
+                                    <a class="text-danger"
+                                       href="{% url 'profile_event_delete' event.id %}">Удалить</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+
+
+{% block content %}
+<section>
+    <div class="section-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-3 pt-3">
+                    {% include 'account/sidebar.html' %}
+                </div>
+                <div class="col-9 pt-3">
+                    <h2>Мой профиль</h2>
+                    {% if user.is_volunteer %}
+                    <div class="jumbotron jumbotron-fluid p-3" style="background-color: #F0F9FF">
+                        <p class="lead"> Уважаемый <b>{{ user.last_name }} {{ user.first_name }}</b>. Здесь, используя раздел "События" Вы можете выступить в качестве волонтера и
+                            запланировать оказание помощи, выбрав экскурсию, которое Вы сможете провести.
+                            При этом необходимо указать дату, время и выбрать ограничения для проведения экскурсии (например, Ваш автомобиль не может вместить коляску).
+                            Просим Вас периодически проверять подписки на созданные Вами события и самостоятельно связываться и обговаривать детали поезки с лицами,
+                            подписавшимися на них.</p>
+                    </div>
+                    {% else %}
+                    <div class="jumbotron jumbotron-fluid p-3" style="background-color: #F0F9FF">
+                        <p class="lead"> Уважаемый <b>{{ user.last_name }} {{ user.first_name }}</b>. Вы можете воспользоваться помощью волонтеров, выбрав подготовленные ими мероприятия на
+                            <a href="{% url 'homepage' %}#allEvents">главной странице сайта</a>. Ниже показаны уже выбранные Вами мероприятия. Волонтер, запланировавший их, должен связаться с Вами в ближайшее время.
+                    </div>
+                    <p class="h4">Мои меропрития</p>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Название</th>
+                                <th scope="col">Дата и время</th>
+                                <th scope="col">Тип события</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in member_list %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'event_detail' member.event.id %}">{{ member.event.template.name }}</a>
+                                </td>
+                                <td>
+                                    <p class="my-0">
+                                        {{ member.datetime.datetime|date:"d F Y г." }}
+                                        {% if not member.event.time_by_agreement %}
+                                        в {{ member.datetime.datetime|date:"H:i" }}
+                                        {% else %}
+                                        <br>Время по договоренности
+                                        {% endif %}
+                                    </p>
+                                </td>
+                                <td>{{ member.event.template.get_type_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">Нет запланированных мероприятий, <a href="{% url 'homepage' %}#allEvents">перейти к выбору мероприятий</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {% if member_list_archive %}
+                    <p class="h4">Архив мероприятий</p>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Название</th>
+                                <th scope="col">Дата и время</th>
+                                <th scope="col">Тип события</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in member_list_archive %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'event_detail' member.event.id %}">{{ member.event.template.name }}</a>
+                                </td>
+                                <td>
+                                    <p class="my-0">
+                                        {{ member.datetime.datetime|date:"d F Y г." }}
+                                        {% if not member.event.time_by_agreement %}
+                                        в {{ member.datetime.datetime|date:"H:i" }}
+                                        {% else %}
+                                        <br>Время по договоренности
+                                        {% endif %}
+                                    </p>
+                                </td>
+                                <td>{{ member.event.template.get_type_display }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endif %}
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
